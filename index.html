@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TabAI - Multiple AI Assistants</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header with app info -->
+    <header class="app-header">
+      <div class="logo">
+        <h1>TabAI</h1>
+      </div>
+      <div class="header-controls">
+        <button id="minimize-btn" class="window-control" title="Minimize">−</button>
+        <button id="maximize-btn" class="window-control" title="Maximize">◻</button>
+        <button id="close-btn" class="window-control close" title="Close">✕</button>
+      </div>
+    </header>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar" id="tab-bar">
+      <div class="tabs" id="tabs">
+        <!-- Tabs will be added here -->
+        <div class="tab active" data-id="home">Home</div>
+      </div>
+      <button class="new-tab-button" id="new-tab-button">+</button>
+    </div>
+
+    <!-- Tab Content Area -->
+    <div class="tab-content" id="tab-content">
+      <!-- Home Tab - Initial View -->
+      <div class="tab-pane active" data-id="home">
+        <div class="home-container">
+          <div class="home-header">
+            <h2>Welcome to TabAI</h2>
+            <p>Access multiple AI assistants from one app</p>
+          </div>
+          
+          <div class="assistants-grid" id="assistants-container">
+            <!-- AI assistants will be loaded here -->
+            <div class="loading">Loading AI assistants...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other tab panes will be added dynamically -->
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <span id="status-message">Ready</span>
+      <span id="tab-count">1 Tab</span>
+    </footer>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html> 

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabAI - All Your AI Assistants in One Place</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f97316;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+            --gray-color: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-color);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--gray-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .screenshot {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cta {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin: 3rem 0;
+            border-radius: 10px;
+        }
+        
+        .cta h2 {
+            color: white;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="logo.png" alt="TabAI Logo" class="logo">
+            </div>
+            <h1>TabAI</h1>
+            <p class="tagline">All Your AI Assistants in One Place</p>
+            <a href="https://github.com/emredost/tabai/releases/latest" class="btn">Download Now</a>
+            <a href="https://github.com/emredost/tabai" class="btn btn-secondary">View on GitHub</a>
+        </div>
+    </header>
+    
+    <main class="container">
+        <section>
+            <h2>About TabAI</h2>
+            <p>TabAI is a desktop application that provides a unified interface for accessing multiple AI chatbot services (Claude, ChatGPT, Gemini, DeepSeek, and Mistral) in a single window with tabbed navigation.</p>
+        </section>
+        
+        <section>
+            <h2>Key Features</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>Unified Interface</h3>
+                    <p>Access multiple AI assistants from a single application without juggling multiple browser tabs.</p>
+                </div>
+                <div class="feature">
+                    <h3>Tabbed Navigation</h3>
+                    <p>Switch between different AI services using tabs, just like in a web browser.</p>
+                </div>
+                <div class="feature">
+                    <h3>Navigation Controls</h3>
+                    <p>Back, forward, and refresh buttons for each AI service, providing a seamless browsing experience.</p>
+                </div>
+                <div class="feature">
+                    <h3>Keyboard Shortcuts</h3>
+                    <p>Quickly switch between tabs using keyboard shortcuts for faster productivity.</p>
+                </div>
+                <div class="feature">
+                    <h3>Modern UI</h3>
+                    <p>Clean, intuitive interface with dark mode support for comfortable use in any lighting condition.</p>
+                </div>
+                <div class="feature">
+                    <h3>Cross-Platform</h3>
+                    <p>Available for Windows, macOS, and Linux, ensuring you can use TabAI on your preferred operating system.</p>
+                </div>
+            </div>
+        </section>
+        
+        <div class="cta">
+            <h2>Ready to Simplify Your AI Workflow?</h2>
+            <p>Download TabAI now and experience the convenience of having all your AI assistants in one place.</p>
+            <a href="https://github.com/emredost/tabai/releases/latest" class="btn">Download TabAI</a>
+        </div>
+        
+        <section>
+            <h2>Supported AI Services</h2>
+            <ul>
+                <li><strong>Claude by Anthropic</strong> - Advanced AI assistant with strong reasoning capabilities</li>
+                <li><strong>ChatGPT by OpenAI</strong> - Popular AI chatbot with extensive knowledge</li>
+                <li><strong>Gemini by Google</strong> - Google's multimodal AI model</li>
+                <li><strong>DeepSeek</strong> - Specialized AI for deep technical questions</li>
+                <li><strong>Mistral</strong> - Lightweight, efficient AI assistant</li>
+            </ul>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SafeAI Solutions by Emre Dost. All rights reserved.</p>
+            <p>Released under the MIT License.</p>
+        </div>
+    </footer>
+</body>
+</html> 
