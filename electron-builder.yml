@@ -1,0 +1,106 @@
+appId: com.safeai.tabai
+productName: TabAI
+copyright: Copyright © 2025 SafeAI Solutions
+
+# Disable asar to avoid symlink issues
+asar: false
+compression: normal
+
+# Application files to include
+files:
+  - "**/*"
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
+  - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+  - "!**/node_modules/*.d.ts"
+  - "!**/node_modules/.bin"
+  - "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}"
+  - "!.editorconfig"
+  - "!**/._*"
+  - "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,__pycache__,thumbs.db,.gitignore,.gitattributes}"
+  - "!**/{.flowconfig,.yarn-metadata.json,.idea,appveyor.yml,.travis.yml,circle.yml,npm-debug.log,.nyc_output,yarn.lock,.yarn-integrity}"
+
+# Extra resources to include
+extraResources:
+  - from: "resources/"
+    to: "resources/"
+    filter: "**/*"
+
+# Windows build configuration
+win:
+  icon: "logo.png"  # Use logo.png directly instead of icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: "${productName}-Setup-${version}.${ext}"
+  publisherName: "SafeAI Solutions"
+
+# Windows installer configuration (NSIS)
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "${productName}"
+  uninstallDisplayName: "${productName}"
+  artifactName: "${productName}-Setup-${version}.${ext}"
+
+# macOS build configuration
+mac:
+  icon: "logo.png"  # Use logo.png directly instead of icon.icns
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+    - target: zip
+  artifactName: "${productName}-${version}-Mac.${ext}"
+  darkModeSupport: true
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: "build/entitlements.mac.plist"
+  entitlementsInherit: "build/entitlements.mac.plist"
+
+# macOS DMG configuration
+dmg:
+  icon: "logo.png"  # Use logo.png directly instead of icon.icns
+  iconSize: 100
+  window:
+    width: 540
+    height: 380
+  contents:
+    - x: 150
+      y: 180
+      type: file
+      path: "${productName}.app"
+    - x: 390
+      y: 180
+      type: link
+      path: "/Applications"
+
+# Linux build configuration
+linux:
+  icon: "logo.png"  # Use logo.png directly instead of icons directory
+  category: Utility
+  target:
+    - target: AppImage
+    - target: deb
+    - target: rpm
+  artifactName: "${productName}-${version}-Linux.${ext}"
+  maintainer: "Emre Dost"
+  vendor: "SafeAI Solutions"
+
+# Debian package configuration
+deb:
+  depends:
+    - libnotify4
+    - libxtst6
+    - libnss3
+
+# RPM package configuration
+rpm:
+  depends:
+    - libnotify
+    - libXtst
+
+# Publish configuration
+publish: null  # Disable publishing 

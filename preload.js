@@ -14,9 +14,11 @@ contextBridge.exposeInMainWorld(
     
     // AI tab management
     openAITab: (assistant) => ipcRenderer.invoke('open-ai-tab', assistant),
+    openNewAIInstance: (assistant) => ipcRenderer.invoke('open-new-ai-instance', assistant),
     showAITab: (tabId) => ipcRenderer.invoke('show-ai-tab', tabId),
     closeAITab: (tabId) => ipcRenderer.invoke('close-ai-tab', tabId),
     closeAllTabs: () => ipcRenderer.invoke('close-all-tabs'),
+    clearAllSessions: () => ipcRenderer.invoke('clear-all-sessions'),
     
     // Navigation controls
     goBack: (tabId) => ipcRenderer.invoke('go-back', tabId),

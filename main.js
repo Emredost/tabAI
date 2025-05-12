@@ -6,6 +6,10 @@ const url = require('url');
 let mainWindow;
 // Keep track of tabs/views
 let activeViews = new Map();
+// Counter for generating unique IDs for multiple instances of the same AI
+let instanceCounters = {};
+// Path for storing persistent data
+const userDataPath = app.getPath('userData');
 
 // AI assistants configuration
 const aiAssistants = [
@@ -39,6 +43,12 @@ const aiAssistants = [
     url: 'https://chat.mistral.ai/',
     icon: '✨'
   },
+  {
+    id: 'google',
+    name: 'Google Search',
+    url: 'https://www.google.com/',
+    icon: '🔎'
+  }
 ];
 
 // Set up window management
@@ -114,22 +124,66 @@ function createWindow() {
 }
 
 // Function to create or show a tab with an AI service
-function createOrShowAITab(aiId, aiName, aiUrl) {
+function createOrShowAITab(aiId, aiName, aiUrl, forceNewInstance = false) {
   if (!mainWindow) return false;
 
-  // If view already exists, show it
-  if (activeViews.has(aiId)) {
-    showAITab(aiId);
-    return true;
+  // Generate a unique ID for this instance if needed
+  let uniqueTabId = aiId;
+  
+  // If we're forcing a new instance or this is ChatGPT (which we want to allow multiple of)
+  if (forceNewInstance || aiId === 'chatgpt') {
+    // Initialize counter if it doesn't exist
+    if (!instanceCounters[aiId]) {
+      instanceCounters[aiId] = 0;
+    }
+    
+    // Increment counter and create unique ID
+    instanceCounters[aiId]++;
+    uniqueTabId = `${aiId}-${instanceCounters[aiId]}`;
+    
+    // Update display name to show instance number (only if more than 1)
+    if (instanceCounters[aiId] > 1) {
+      aiName = `${aiName} (${instanceCounters[aiId]})`;
+    }
+  }
+  else {
+    // For non-ChatGPT services, if view already exists, show it
+    if (activeViews.has(aiId)) {
+      showAITab(aiId);
+      return true;
+    }
   }
 
-  // Create a new BrowserView for this tab
+  // Create a persistent session for this AI service
+  const sessionId = `ai-session-${uniqueTabId}`;
+  const ses = session.fromPartition(`persist:${sessionId}`);
+  
+  // Apply the same header modifications to the persistent session
+  ses.webRequest.onHeadersReceived((details, callback) => {
+    const responseHeaders = details.responseHeaders || {};
+    
+    // Remove security headers that would prevent embedding
+    delete responseHeaders['x-frame-options'];
+    delete responseHeaders['X-Frame-Options'];
+    delete responseHeaders['content-security-policy'];
+    delete responseHeaders['Content-Security-Policy'];
+    
+    // Add permissive CORS headers
+    responseHeaders['Access-Control-Allow-Origin'] = ['*'];
+    responseHeaders['Access-Control-Allow-Methods'] = ['*'];
+    responseHeaders['Access-Control-Allow-Headers'] = ['*'];
+    
+    callback({ responseHeaders });
+  });
+  
+  // Create a new BrowserView for this tab with the persistent session
   const view = new BrowserView({
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: false,
-      allowRunningInsecureContent: true
+      allowRunningInsecureContent: true,
+      partition: `persist:${sessionId}`
     }
   });
 
@@ -170,24 +224,24 @@ function createOrShowAITab(aiId, aiName, aiUrl) {
     }
     // Show this view and notify UI
     mainWindow.addBrowserView(view);
-    mainWindow.webContents.send('ai-tab-loaded', { id: aiId, title: aiName });
+    mainWindow.webContents.send('ai-tab-loaded', { id: uniqueTabId, title: aiName });
   });
   
   // Handle errors
   view.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error(`Failed to load ${aiUrl}: ${errorDescription}`);
     mainWindow.webContents.send('ai-tab-error', { 
-      id: aiId, 
+      id: uniqueTabId, 
       title: aiName,
       error: errorDescription 
     });
   });
   
   // Store the view
-  activeViews.set(aiId, view);
+  activeViews.set(uniqueTabId, view);
   
   // Notify UI that we're creating a tab
-  mainWindow.webContents.send('ai-tab-created', { id: aiId, title: aiName });
+  mainWindow.webContents.send('ai-tab-created', { id: uniqueTabId, title: aiName });
   
   return true;
 }
@@ -259,11 +313,16 @@ app.whenReady().then(() => {
     callback({ path: path.normalize(`${__dirname}/${url}`) });
   });
   
-  // Set default permissions for media devices
-  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-    // Allow all permission requests from our app
-    callback(true);
-  });
+  // Set default permissions for media devices for all sessions
+  const setSessionPermissions = (sess) => {
+    sess.setPermissionRequestHandler((webContents, permission, callback) => {
+      // Allow all permission requests from our app
+      callback(true);
+    });
+  };
+  
+  // Apply to default session
+  setSessionPermissions(session.defaultSession);
   
   createWindow();
 
@@ -278,8 +337,8 @@ ipcMain.handle('get-ai-assistants', () => {
 });
 
 // Handle opening AI in tab
-ipcMain.handle('open-ai-tab', (event, assistant) => {
-  return createOrShowAITab(assistant.id, assistant.name, assistant.url);
+ipcMain.handle('open-ai-tab', (event, assistant, forceNewInstance = false) => {
+  return createOrShowAITab(assistant.id, assistant.name, assistant.url, forceNewInstance);
 });
 
 // Handle showing an existing tab
@@ -414,4 +473,60 @@ ipcMain.handle('close-all-tabs', () => {
 // Quit when all windows are closed
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// Add a specific handler for creating a new instance
+ipcMain.handle('open-new-ai-instance', (event, assistant) => {
+  return createOrShowAITab(assistant.id, assistant.name, assistant.url, true);
+});
+
+// Add a function to clear all session data
+function clearAllSessionData() {
+  return new Promise((resolve, reject) => {
+    try {
+      // First close all existing sessions
+      for (const [id, view] of activeViews) {
+        mainWindow.removeBrowserView(view);
+        view.webContents.session.clearStorageData();
+        view.webContents.destroy();
+      }
+      
+      // Clear the views map
+      activeViews.clear();
+      
+      // Reset instance counters
+      instanceCounters = {};
+      
+      // Clear all sessions in the app data directory
+      const ses = session.defaultSession;
+      ses.clearStorageData()
+        .then(() => {
+          // Also try to clear any other sessions
+          session.getAllSessions().forEach(sess => {
+            sess.clearStorageData().catch(err => {
+              console.error('Error clearing session:', err);
+            });
+          });
+          
+          // Let the renderer know sessions were cleared
+          if (mainWindow) {
+            mainWindow.webContents.send('sessions-cleared');
+          }
+          
+          resolve(true);
+        })
+        .catch(err => {
+          console.error('Error clearing default session:', err);
+          reject(err);
+        });
+    } catch (error) {
+      console.error('Error in clearAllSessionData:', error);
+      reject(error);
+    }
+  });
+}
+
+// Add an IPC handler for it
+ipcMain.handle('clear-all-sessions', () => {
+  return clearAllSessionData();
 }); 

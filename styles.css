@@ -162,6 +162,8 @@ body {
   color: white;
   border: 2px solid #3b82f6;
   animation: pulse-border 2s infinite ease-in-out;
+  position: relative;
+  overflow: visible;
 }
 
 @keyframes pulse-border {
@@ -178,6 +180,39 @@ body {
 #add-tab-button:hover {
   background-color: #1d4ed8;
   transform: scale(1.05);
+}
+
+/* Tooltip styles */
+.button-tooltip {
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+.button-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+#add-tab-button:hover .button-tooltip {
+  opacity: 1;
 }
 
 /* Tab Content */
@@ -774,24 +809,81 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 8px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   padding: 20px;
+  z-index: 9999;
   min-width: 300px;
-  max-width: 400px;
-  z-index: 3000;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  max-width: 90%;
 }
 
 .ai-selector-popup h3 {
-  margin: 0 0 15px 0;
-  color: #eee;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--text-color);
   text-align: center;
-  font-size: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.selector-btn-container {
+  display: flex;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.selector-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: var(--bg-color-light);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  color: var(--text-color);
+  transition: background-color 0.2s ease;
+}
+
+.selector-btn:hover {
+  background-color: var(--hover-color);
+}
+
+.selector-btn .icon {
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+.google-search-btn {
+  background-color: #f8f9fa;
+  color: #202124;
+  border: 1px solid #dadce0;
+}
+
+.google-search-btn:hover {
+  background-color: #e8f0fe;
+  border-color: #d2e3fc;
+  box-shadow: 0 1px 2px rgba(66, 133, 244, 0.3);
+}
+
+.google-search-btn .icon {
+  color: #4285f4;
+}
+
+.new-instance-btn {
+  background-color: var(--bg-color-lighter);
+  color: var(--accent-color);
+  flex: 0 0 auto;
+  padding: 10px;
+  width: auto;
+}
+
+.new-instance-btn:hover {
+  background-color: var(--accent-color-light);
+  color: var(--bg-color);
 }
 
 .close-popup-btn {
@@ -800,43 +892,13 @@ footer {
   right: 10px;
   background: none;
   border: none;
-  color: #aaa;
   font-size: 20px;
   cursor: pointer;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  color: var(--text-color-light);
 }
 
 .close-popup-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.selector-btn {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  background-color: #2a2a2a;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  text-align: left;
-}
-
-.selector-btn:hover {
-  background-color: #2563eb;
-}
-
-.selector-btn .icon {
-  margin-right: 12px;
-  font-size: 20px;
+  color: var(--text-color);
 }
 
 /* Improve Home tab styling to make it more clickable */
@@ -847,4 +909,115 @@ footer {
   z-index: 2001;
   pointer-events: auto !important;
   cursor: pointer !important;
+}
+
+/* Application theme */
+:root {
+  --bg-color: #1a1a1a;
+  --bg-color-light: #2a2a2a;
+  --bg-color-lighter: #333333;
+  --text-color: #f5f5f5;
+  --text-color-light: #aaaaaa;
+  --border-color: #444444;
+  --accent-color: #3b82f6;
+  --accent-color-light: #60a5fa;
+  --accent-color-dark: #2563eb;
+  --hover-color: #333333;
+  --error-color: #ef4444;
+  --success-color: #22c55e;
+}
+
+/* Dark theme variations */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #111111;
+    --bg-color-light: #1e1e1e;
+    --bg-color-lighter: #2a2a2a;
+    --text-color: #f5f5f5;
+    --text-color-light: #aaaaaa;
+    --border-color: #333333;
+    --accent-color: #3b82f6;
+    --accent-color-light: #60a5fa;
+    --accent-color-dark: #2563eb;
+    --hover-color: #2c2c2c;
+    --error-color: #ef4444;
+    --success-color: #22c55e;
+  }
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  bottom: -100px;
+  right: 20px;
+  width: 300px;
+  background-color: var(--bg-color-light);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease, bottom 0.3s ease;
+  overflow: hidden;
+}
+
+.notification-visible {
+  bottom: 20px;
+  opacity: 1;
+}
+
+.notification-hiding {
+  opacity: 0;
+  bottom: -100px;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: var(--bg-color-lighter);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notification-header strong {
+  color: var(--text-color);
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-color-light);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-close:hover {
+  color: var(--text-color);
+}
+
+.notification-body {
+  padding: 12px 15px;
+  color: var(--text-color);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Clear Sessions Button */
+.clear-sessions-btn {
+  background-color: #574c4c;
+  color: white;
+  border: 1px solid #6b5d5d;
+}
+
+.clear-sessions-btn:hover {
+  background-color: #8b3030;
+  transform: translateY(-2px);
 } 

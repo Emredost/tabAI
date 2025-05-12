@@ -53,6 +53,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const button = createQuickLaunchButton(assistant);
         quickLaunchContainer.appendChild(button);
       });
+      
+      // Add "Clear All Sessions" button at the end
+      const clearButton = document.createElement('button');
+      clearButton.className = 'quick-launch-btn clear-sessions-btn';
+      clearButton.innerHTML = `
+        <span class="icon">🔄</span>
+        <span class="name">Clear All Logins</span>
+      `;
+      
+      clearButton.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all saved login sessions? You will need to log in again for each AI service.')) {
+          window.api.clearAllSessions()
+            .then(() => {
+              updateStatusMessage('All login sessions cleared successfully');
+              showNotification('Sessions Cleared', 'All login sessions have been cleared. You will need to log in again the next time you open each AI service.');
+            })
+            .catch(err => {
+              console.error('Error clearing sessions:', err);
+              showNotification('Error', 'Failed to clear sessions. Please try restarting the app.');
+            });
+        }
+      });
+      
+      quickLaunchContainer.appendChild(clearButton);
     }
     
     // Store assistant data but don't display it
@@ -532,6 +556,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update UI
       updateStatusMessage(`Opening ${assistant.name} in tab...`);
       
+      // Show persistence notification the first time
+      const hasShownLoginInfo = localStorage.getItem('hasShownLoginInfo');
+      if (!hasShownLoginInfo) {
+        setTimeout(() => {
+          showNotification(
+            'Login Sessions Saved', 
+            'Your login sessions will be automatically saved. You won\'t need to log in again the next time you open the app.',
+            8000
+          );
+          localStorage.setItem('hasShownLoginInfo', 'true');
+        }, 3000);
+      }
+      
       // Force update UI controls after a short delay
       setTimeout(forceUpdateUIControls, 300);
     } catch (error) {
@@ -584,7 +621,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       'chatgpt': 'OpenAI\'s powerful language model with versatile capabilities, code generation, and creative tasks.',
       'gemini': 'Google\'s most capable AI model with real-time information, image understanding, and factual responses.',
       'deepseek': 'Advanced model for deep learning tasks with technical depth, research capabilities, and complex reasoning.',
-      'mistral': 'Efficient and powerful open-source model with performance, efficiency, and balanced capabilities.'
+      'mistral': 'Efficient and powerful open-source model with performance, efficiency, and balanced capabilities.',
+      'google': 'Google Search for quick web searches, information lookup, and general browsing.'
     };
     
     return descriptions[aiId] || 'An AI assistant';
@@ -609,13 +647,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       menuContainer.appendChild(closeBtn);
       
       const heading = document.createElement('h3');
-      heading.textContent = 'Select AI Assistant';
+      heading.textContent = 'Select AI Assistant or Search';
       menuContainer.appendChild(heading);
       
       // Create buttons for each AI assistant
       aiAssistants.forEach(assistant => {
+        const btnContainer = document.createElement('div');
+        btnContainer.className = 'selector-btn-container';
+        
+        // Create the regular button
         const btn = document.createElement('button');
         btn.className = 'selector-btn';
+        
+        // Add special class for Google search to highlight it
+        if (assistant.id === 'google') {
+          btn.className = 'selector-btn google-search-btn';
+        }
+        
         btn.innerHTML = `<span class="icon">${assistant.icon}</span> ${assistant.name}`;
         
         btn.addEventListener('click', () => {
@@ -623,7 +671,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           openAITab(assistant);
         });
         
-        menuContainer.appendChild(btn);
+        btnContainer.appendChild(btn);
+        
+        // For ChatGPT, add a "New Instance" button
+        if (assistant.id === 'chatgpt') {
+          const newInstanceBtn = document.createElement('button');
+          newInstanceBtn.className = 'selector-btn new-instance-btn';
+          newInstanceBtn.innerHTML = `<span class="icon">➕</span> New ChatGPT`;
+          
+          newInstanceBtn.addEventListener('click', () => {
+            document.body.removeChild(menuContainer);
+            openNewAIInstance(assistant);
+          });
+          
+          btnContainer.appendChild(newInstanceBtn);
+        }
+        
+        menuContainer.appendChild(btnContainer);
       });
       
       document.body.appendChild(menuContainer);
@@ -631,18 +695,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error showing AI selector:', error);
       
       // Fallback to simple prompt
-    const options = aiAssistants.map((ai, index) => `${index + 1}. ${ai.name}`).join('\n');
+      const options = aiAssistants.map((ai, index) => `${index + 1}. ${ai.name}`).join('\n');
       const input = prompt(`Select an AI Assistant to open in tab:\n${options}`);
     
-    if (input !== null) {
-      const index = parseInt(input, 10) - 1;
-      if (!isNaN(index) && index >= 0 && index < aiAssistants.length) {
+      if (input !== null) {
+        const index = parseInt(input, 10) - 1;
+        if (!isNaN(index) && index >= 0 && index < aiAssistants.length) {
           openAITab(aiAssistants[index]);
-      } else {
-        alert('Invalid selection');
+        } else {
+          alert('Invalid selection');
+        }
       }
     }
   }
+  
+  // Function to open a new instance of an AI assistant
+  function openNewAIInstance(assistant) {
+    try {
+      // Open as a new tab instance
+      window.api.openNewAIInstance(assistant);
+      
+      // Update UI
+      updateStatusMessage(`Opening new ${assistant.name} instance...`);
+      
+      // Show persistence notification the first time
+      const hasShownLoginInfo = localStorage.getItem('hasShownLoginInfo');
+      if (!hasShownLoginInfo) {
+        setTimeout(() => {
+          showNotification(
+            'Login Sessions Saved', 
+            'Your login sessions will be automatically saved. You won\'t need to log in again the next time you open the app.',
+            8000
+          );
+          localStorage.setItem('hasShownLoginInfo', 'true');
+        }, 3000);
+      }
+      
+      // Force update UI controls after a short delay
+      setTimeout(forceUpdateUIControls, 300);
+    } catch (error) {
+      console.error(`Error opening new assistant instance:`, error);
+      showError(`Failed to open new assistant instance. Error: ${error.message || 'Unknown error'}`);
+      
+      // Fallback to external browser
+      window.api.openExternalLink(assistant.url);
+    }
   }
   
   // Create a quick launch button
@@ -782,10 +879,14 @@ function ensureButtonsFunctional() {
   if (addTabBtn) {
     console.log('Re-initializing new tab button');
     // Direct style overrides
-    addTabBtn.style.zIndex = '3000';
+    addTabBtn.style.zIndex = '9999';
     addTabBtn.style.position = 'relative';
     addTabBtn.style.pointerEvents = 'auto';
     addTabBtn.style.cursor = 'pointer';
+    
+    // Add a distinct border to make it more visible
+    addTabBtn.style.border = '2px solid #4285f4';
+    addTabBtn.style.boxShadow = '0 0 5px rgba(66, 133, 244, 0.5)';
     
     // Remove and re-add event listener
     const newBtn = addTabBtn.cloneNode(true);
@@ -798,6 +899,12 @@ function ensureButtonsFunctional() {
       showAISelector();
       return false;
     });
+    
+    // Add a small tooltip that appears on hover
+    const tooltip = document.createElement('div');
+    tooltip.className = 'button-tooltip';
+    tooltip.textContent = 'Open AI Assistant or Search';
+    newBtn.appendChild(tooltip);
   }
   
   // Make sure home tab is clickable
@@ -822,4 +929,45 @@ function ensureButtonsFunctional() {
       return false;
     });
   }
+}
+
+// Add a function to show notifications to the user
+function showNotification(title, message, duration = 5000) {
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.innerHTML = `
+    <div class="notification-header">
+      <strong>${title}</strong>
+      <button class="notification-close">×</button>
+    </div>
+    <div class="notification-body">
+      ${message}
+    </div>
+  `;
+  
+  // Add close button functionality
+  const closeBtn = notification.querySelector('.notification-close');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(notification);
+  });
+  
+  // Auto-hide after duration
+  setTimeout(() => {
+    if (document.body.contains(notification)) {
+      notification.classList.add('notification-hiding');
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 500);
+    }
+  }, duration);
+  
+  // Add to document
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.classList.add('notification-visible');
+  }, 10);
 } 
