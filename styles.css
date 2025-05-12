@@ -69,11 +69,15 @@ body {
 
 /* Tab Bar */
 .tab-bar {
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #333;
+  height: 40px;
   display: flex;
-  background-color: #0f172a;
-  padding: 0 0.5rem;
-  height: 2.5rem;
   align-items: center;
+  padding: 0 8px;
+  z-index: 2000;
+  position: relative;
+  pointer-events: auto;
 }
 
 .tabs {
@@ -88,24 +92,39 @@ body {
 }
 
 .tab {
-  padding: 0.5rem 1rem;
-  background-color: #1e293b;
-  color: #94a3b8;
-  margin-right: 2px;
-  border-radius: 4px 4px 0 0;
-  cursor: pointer;
-  white-space: nowrap;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  background-color: #2a2a2a;
+  height: 32px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border: 1px solid transparent;
   display: flex;
   align-items: center;
-  height: 2rem;
+  min-width: 100px;
+  max-width: 180px;
+  padding: 0 8px;
+  margin-right: 1px;
+  transition: background-color 0.2s;
+  position: relative;
+  z-index: 2001;
+  pointer-events: auto;
 }
 
 .tab.active {
   background-color: #2563eb;
+  border-bottom-color: transparent;
   color: white;
+  position: relative;
+}
+
+/* Add active tab indicator */
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #2563eb;
 }
 
 .tab .tab-close {
@@ -118,44 +137,70 @@ body {
   opacity: 1;
 }
 
-.new-tab-button {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  width: 2rem;
-  height: 2rem;
-  font-size: 1.25rem;
-  cursor: pointer;
+.new-tab-button, #add-tab-button {
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 0.5rem;
+  background-color: #2a2a2a;
+  border: none;
+  color: #aaa;
+  cursor: pointer !important;
+  border-radius: 4px;
+  margin-left: 8px;
+  transition: background-color 0.2s;
+  z-index: 3000 !important;
+  position: relative;
+  pointer-events: auto !important;
 }
 
-.new-tab-button:hover {
+/* Add a highlight style to make it more visible */
+#add-tab-button {
+  background-color: #2563eb;
   color: white;
+  border: 2px solid #3b82f6;
+  animation: pulse-border 2s infinite ease-in-out;
+}
+
+@keyframes pulse-border {
+  0% { border-color: #3b82f6; }
+  50% { border-color: #60a5fa; }
+  100% { border-color: #3b82f6; }
+}
+
+.new-tab-button:hover, #add-tab-button:hover {
+  background-color: #3a3a3a;
+  color: white;
+}
+
+#add-tab-button:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05);
 }
 
 /* Tab Content */
 .tab-content {
   flex: 1;
-  position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
 .tab-pane {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white;
   display: none;
-  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+  height: 100%;
+  width: 100%;
 }
 
 .tab-pane.active {
   display: block;
+  opacity: 1;
+  z-index: 998;
 }
 
 /* Home Container */
@@ -163,8 +208,18 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  overflow-y: auto;
+  overflow: hidden;
+  background-color: #111;
+  color: #eee;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.home-container.visible {
+  opacity: 1;
+  visibility: visible;
+  z-index: 999;
 }
 
 .home-header {
@@ -182,11 +237,126 @@ body {
   color: #64748b;
 }
 
+/* Add styles for the updated home page */
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.logo-text {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.tagline {
+  font-size: 1.25rem;
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.ai-quick-launch {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.launch-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.quick-launch-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  min-width: 140px;
+}
+
+.quick-launch-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.quick-launch-btn .icon {
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+}
+
+.hidden-assistants-grid {
+  display: none !important;
+  position: absolute;
+  visibility: hidden;
+  z-index: -1000;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.home-footer {
+  padding: 1rem;
+  text-align: center;
+  color: #888;
+  background-color: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.branding {
+  font-size: 1rem;
+}
+
+.branding p {
+  margin: 0.25rem 0;
+}
+
+.copyright {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
 /* Assistants Grid */
 .assistants-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
   margin: 1rem 0;
   flex: 1;
 }
@@ -196,7 +366,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -210,7 +380,7 @@ body {
 }
 
 .assistant-header {
-  padding: 1.5rem;
+  padding: 12px;
   background-color: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
@@ -229,7 +399,7 @@ body {
 }
 
 .assistant-body {
-  padding: 1.5rem;
+  padding: 12px;
   flex: 1;
 }
 
@@ -239,7 +409,7 @@ body {
 }
 
 .assistant-footer {
-  padding: 1rem 1.5rem;
+  padding: 12px;
   background-color: #f8fafc;
   border-top: 1px solid #e2e8f0;
 }
@@ -333,11 +503,11 @@ body {
 .status-bar {
   display: flex;
   justify-content: space-between;
-  padding: 0.25rem 1rem;
-  background-color: #f1f5f9;
-  color: #64748b;
-  font-size: 0.75rem;
-  border-top: 1px solid #e2e8f0;
+  padding: 4px 12px;
+  background-color: #1a1a1a;
+  color: #aaa;
+  font-size: 12px;
+  border-top: 1px solid #333;
 }
 
 /* Footer */
@@ -348,4 +518,333 @@ footer {
   margin-top: auto;
   color: #64748b;
   font-size: 0.875rem;
+}
+
+/* Tab styles */
+#tabs {
+  display: flex;
+  background-color: #2a2a2a;
+  padding: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  height: 40px;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin-right: 2px;
+  background-color: #333;
+  color: #aaa;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  max-width: 200px;
+  min-width: 100px;
+  position: relative;
+}
+
+.tab:hover {
+  background-color: #444;
+}
+
+.tab.active {
+  background-color: #4a4a4a;
+  color: white;
+}
+
+.tab-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.tab-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-close {
+  margin-left: 8px;
+  color: #888;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  z-index: 2003;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.tab-close:hover {
+  background-color: #666;
+  color: white;
+}
+
+#new-tab-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  color: #aaa;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 4px;
+}
+
+#new-tab-button:hover {
+  background-color: #444;
+  color: white;
+}
+
+/* Adjust the main content area for tabs */
+#content {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* Add navigation bar styles */
+.nav-bar {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  z-index: 1999;
+  position: relative;
+  pointer-events: auto;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+}
+
+.nav-btn {
+  background-color: #2a2a2a;
+  color: #ddd;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2002;
+  position: relative;
+  pointer-events: auto !important;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  color: white;
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab-selector {
+  margin-left: auto;
+  z-index: 2002;
+  position: relative;
+  pointer-events: auto !important;
+}
+
+#quick-tab-switcher {
+  background-color: #2a2a2a;
+  color: #ddd;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  min-width: 150px;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+#quick-tab-switcher option {
+  background-color: #2a2a2a;
+  color: #ddd;
+  padding: 8px;
+}
+
+/* Compact tab display */
+.tab {
+  height: 32px;
+  min-width: 80px;
+  max-width: 160px;
+  padding: 0 8px 0 12px;
+}
+
+/* Make tab icons more prominent */
+.tab-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+/* Better close button */
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px;
+  width: 16px;
+  font-size: 14px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.tab-close:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Style the assistant cards to be more compact */
+.assistants-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.assistant-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.assistant-header {
+  padding: 12px;
+}
+
+.assistant-body {
+  padding: 12px;
+}
+
+.assistant-footer {
+  padding: 12px;
+}
+
+/* Make the status bar more visible */
+.status-bar {
+  background-color: #1a1a1a;
+  color: #aaa;
+  padding: 4px 12px;
+  font-size: 12px;
+  border-top: 1px solid #333;
+}
+
+/* Add tab shortcuts tooltip */
+#tab-bar::after {
+  content: 'Press Ctrl+Tab to switch tabs';
+  position: absolute;
+  right: 10px;
+  top: -24px;
+  background-color: #333;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+#tab-bar:hover::after {
+  opacity: 1;
+}
+
+/* Add styles for the AI Selector popup */
+.ai-selector-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 300px;
+  max-width: 400px;
+  z-index: 3000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-selector-popup h3 {
+  margin: 0 0 15px 0;
+  color: #eee;
+  text-align: center;
+  font-size: 18px;
+}
+
+.close-popup-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-popup-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.selector-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.selector-btn:hover {
+  background-color: #2563eb;
+}
+
+.selector-btn .icon {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+/* Improve Home tab styling to make it more clickable */
+.tab[data-tab-id="home"] {
+  background-color: #2a2a2a;
+  color: white;
+  min-width: 100px;
+  z-index: 2001;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 } 
