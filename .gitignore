@@ -1,0 +1,53 @@
+# Dependency directories
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor folders
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.directory
+.project
+.settings/
+
+# Logs
+logs
+*.log
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Electron specific
+.webpack/
+.electron-react/
+electron-builder.env
+electron-builder.yml
+electron-builder.yaml
+electron-builder.json
+
+# Testing
+coverage/
+.nyc_output/
+
